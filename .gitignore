@@ -1,11 +1,2 @@
 
 node_modules
-Controller
-Config
-Database
-middlewares
-models
-Router
-app.js
-server.js
-package-lock.json
