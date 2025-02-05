@@ -6,6 +6,8 @@ import fileUpload from 'express-fileupload';
 import bodyParser from 'body-parser';
 import dbConnection from './Database/dbConnection.js';
 import { errorMiddleware } from './middlewares/error.js';
+import userRouter from './Router/userRoutes.js';
+import studentRouter from './Router/studentRoutes.js';
 
 const app = express();
 
@@ -41,5 +43,8 @@ app.use(
 
 dbConnection();
 app.use(errorMiddleware);
+
+app.use('/api/v1/user', userRouter);
+app.use('/api/v1/student', studentRouter);
 
 export default app;

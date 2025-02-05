@@ -24,6 +24,8 @@ export const register = catchAsyncError(async (req, res, next) => {
     );
   }
 
+  //   cloudinaryResponseForResume error
+
   const {
     userType,
     userName,
