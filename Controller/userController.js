@@ -1,8 +1,8 @@
-import { catchAsyncError } from "../middlewares/catchAsyncError.js";
-import ErrorHandler from "../middlewares/error.js";
-import { User } from "../models/userSchema.js";
-import { v2 as cloudinary } from "cloudinary";
-import jwt from "jsonwebtoken";
+import { catchAsyncError } from '../middlewares/catchAsyncError.js';
+import ErrorHandler from '../middlewares/error.js';
+import { User } from '../models/userSchema.js';
+import { v2 as cloudinary } from 'cloudinary';
+import jwt from 'jsonwebtoken';
 
 export const register = catchAsyncError(async (req, res, next) => {
   // if (!req.files || Object.keys(req.files).length === 0) {
@@ -37,6 +37,17 @@ export const register = catchAsyncError(async (req, res, next) => {
     termsAndCondtion,
   } = req.body;
 
+  const existingEmail = await User.findOne({ email });
+  if (existingEmail) {
+    // return res.status(409).json({ error: 'Email is already registered' });
+    return next(new ErrorHandler('Email is already registered', 409));
+  }
+
+  const existingUserName = await User.findOne({ userName });
+  if (existingUserName) {
+    return next(new ErrorHandler('Username is already taken', 409));
+  }
+
   // const organisationId = req.Organisation
   // console.log(req.Organisation);
 
@@ -60,7 +71,7 @@ export const register = catchAsyncError(async (req, res, next) => {
   const result = CreateUser.toJSON();
   res.status(200).json({
     success: true,
-    message: "user Register",
+    message: 'user Register',
     data: result,
   });
 });
@@ -69,25 +80,25 @@ export const register = catchAsyncError(async (req, res, next) => {
 export const login = catchAsyncError(async (req, res, next) => {
   const { email, password, termsAndCondtion } = req.body;
   if (!email || !password) {
-    return next(new ErrorHandler("Provide Email And Password!", 400));
+    return next(new ErrorHandler('Provide Email And Password!', 400));
   }
   if (!termsAndCondtion) {
-    return next(new ErrorHandler("Please accept the term&con!", 400));
+    return next(new ErrorHandler('Please accept the term&con!', 400));
   }
-  const user = await User.findOne({ email }).select("+password");
+  const user = await User.findOne({ email }).select('+password');
   if (!user) {
-    return next(new ErrorHandler("Invalid Email Or Password!", 404));
+    return next(new ErrorHandler('Invalid Email Or Password!', 404));
   }
   const isPasswordMatched = await user.comparePassword(password);
   if (!isPasswordMatched) {
-    return next(new ErrorHandler("Invalid Email Or Password", 401));
+    return next(new ErrorHandler('Invalid Email Or Password', 401));
   }
   const token = await jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_EXPIRES,
   });
   res
     .status(200)
-    .cookie("token", token, {
+    .cookie('token', token, {
       httpOnly: true,
       expires: new Date(
         Date.now() + process.env.COOKIE_EXPIRES * 24 * 60 * 60 * 100
@@ -95,7 +106,7 @@ export const login = catchAsyncError(async (req, res, next) => {
     })
     .json({
       success: true,
-      message: "user login Succesfully",
+      message: 'user login Succesfully',
       user,
       token,
     });
@@ -105,13 +116,13 @@ export const login = catchAsyncError(async (req, res, next) => {
 export const logOut = catchAsyncError(async (req, res, next) => {
   res
     .status(200)
-    .cookie("token", "", {
+    .cookie('token', '', {
       expires: new Date(Date.now()),
       httpOnly: true,
     })
     .json({
       success: true,
-      message: "User Logout Successfuly",
+      message: 'User Logout Successfuly',
     });
 });
 
@@ -149,7 +160,7 @@ export const updateuser = catchAsyncError(async (req, res, next) => {
     await cloudinary.uploader.destroy(profileImageId);
     const cloudinaryResponse = await cloudinary.uploader.upload(
       image.tempFilePath,
-      { folder: "imageS" }
+      { folder: 'imageS' }
     );
     newUserdata.image = {
       public_id: cloudinaryResponse.public_id,
@@ -164,7 +175,7 @@ export const updateuser = catchAsyncError(async (req, res, next) => {
   });
   res.status(200).json({
     success: true,
-    message: "User Profile Update",
+    message: 'User Profile Update',
     user,
   });
 });
@@ -173,12 +184,12 @@ export const updateuser = catchAsyncError(async (req, res, next) => {
 export const updatePassword = catchAsyncError(async (req, res, next) => {
   const { currentPassword, newPassword, confirmNewPassword } = req.body;
   if (!currentPassword || !newPassword || !confirmNewPassword) {
-    return next(new ErrorHandler("Please Fill all the Fill", 400));
+    return next(new ErrorHandler('Please Fill all the Fill', 400));
   }
-  const user = await User.findById(req.user.id).select("password");
+  const user = await User.findById(req.user.id).select('password');
   const isPasswordMatched = await user.comparePassword(currentPassword);
   if (!isPasswordMatched) {
-    return next(new ErrorHandler("Incorrent Current Password ", 400));
+    return next(new ErrorHandler('Incorrent Current Password ', 400));
   }
   if (newPassword !== confirmNewPassword) {
     return next(
@@ -193,7 +204,7 @@ export const updatePassword = catchAsyncError(async (req, res, next) => {
   await user.save();
   res.status(200).json({
     success: true,
-    message: "Password Updated!!",
+    message: 'Password Updated!!',
   });
 });
 
@@ -205,9 +216,9 @@ export const savefile = catchAsyncError(async (req, res, next) => {
   try {
     res.status(200).json({
       success: true,
-      message: "User data saved successfully",
+      message: 'User data saved successfully',
     });
   } catch (error) {
-    res.status(500).json({ message: "Error saving user data", error });
+    res.status(500).json({ message: 'Error saving user data', error });
   }
 });

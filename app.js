@@ -42,9 +42,11 @@ app.use(
 );
 
 dbConnection();
-app.use(errorMiddleware);
 
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/student', studentRouter);
+
+// Error handling middleware should be the last middleware
+app.use(errorMiddleware);
 
 export default app;
