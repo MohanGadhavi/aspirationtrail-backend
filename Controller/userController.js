@@ -5,24 +5,24 @@ import { v2 as cloudinary } from "cloudinary";
 import jwt from "jsonwebtoken";
 
 export const register = catchAsyncError(async (req, res, next) => {
-  if (!req.files || Object.keys(req.files).length === 0) {
-    return next(new ErrorHandler("image are require", 400));
-  }
+  // if (!req.files || Object.keys(req.files).length === 0) {
+  //   return next(new ErrorHandler("image are require", 400));
+  // }
 
   //cloudinaryResponseForimage error
-  const { image } = req.files;
+  // const { image } = req.files;
 
-  const cloudinaryResponseForImage = await cloudinary.uploader.upload(
-    image.tempFilePath,
-    { folder: "image" }
-  );
+  // const cloudinaryResponseForImage = await cloudinary.uploader.upload(
+  //   image.tempFilePath,
+  //   { folder: "image" }
+  // );
 
-  if (!cloudinaryResponseForImage || cloudinaryResponseForImage.error) {
-    console.error(
-      "Cloudinary Error:",
-      cloudinaryResponseForImage.error || "Unknow Cloudinary error"
-    );
-  }
+  // if (!cloudinaryResponseForImage || cloudinaryResponseForImage.error) {
+  //   console.error(
+  //     "Cloudinary Error:",
+  //     cloudinaryResponseForImage.error || "Unknow Cloudinary error"
+  //   );
+  // }
 
   //   cloudinaryResponseForResume error
 
@@ -51,10 +51,10 @@ export const register = catchAsyncError(async (req, res, next) => {
     phone,
     password,
     termsAndCondtion,
-    image: {
-      public_id: cloudinaryResponseForImage.public_id,
-      url: cloudinaryResponseForImage.secure_url,
-    },
+    // image: {
+    //   public_id: cloudinaryResponseForImage.public_id,
+    //   url: cloudinaryResponseForImage.secure_url,
+    // },
   });
 
   const result = CreateUser.toJSON();
